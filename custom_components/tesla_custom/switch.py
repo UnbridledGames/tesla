@@ -22,7 +22,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             entities.append(RangeSwitch(device, coordinator))
         elif device.type == "sentry mode switch":
             entities.append(SentryModeSwitch(device, coordinator))        
-        elif device.type == "steering wheel heater":
+        elif device.type == "heated steering switch":
             entities.append(SteeringWheelHeaterSwitch(device, coordinator))
     async_add_entities(entities, True)
 
