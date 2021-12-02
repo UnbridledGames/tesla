@@ -21,7 +21,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         elif device.type == "maxrange switch":
             entities.append(RangeSwitch(device, coordinator))
         elif device.type == "sentry mode switch":
-            entities.append(SentryModeSwitch(device, coordinator))
+            entities.append(SentryModeSwitch(device, coordinator))        
+        elif device.type == "steering wheel heater":
+            entities.append(SteeringWheelHeaterSwitch(device, coordinator))
     async_add_entities(entities, True)
 
 
@@ -133,6 +135,30 @@ class SentryModeSwitch(TeslaDevice, SwitchEntity):
         """Send the off command."""
         _LOGGER.debug("Disable sentry mode: %s", self.name)
         await self.tesla_device.disable_sentry_mode()
+        self.async_write_ha_state()
+
+    @property
+    def is_on(self):
+        """Get whether the switch is in on state."""
+        if self.tesla_device.is_on() is None:
+            return None
+        return self.tesla_device.is_on()
+
+class SteeringWheelHeaterSwitch(TeslaDevice, SwitchEntity):
+    """Representation of a Tesla steering wheel heater switch."""
+
+    @TeslaDevice.Decorators.check_for_reauth
+    async def async_turn_on(self, **kwargs):
+        """Send the on command."""
+        _LOGGER.debug("Enable steering wheel heater: %s", self.name)
+        await self.tesla_device.set_steering_wheel_heat(True)
+        self.async_write_ha_state()
+
+    @TeslaDevice.Decorators.check_for_reauth
+    async def async_turn_off(self, **kwargs):
+        """Send the off command."""
+        _LOGGER.debug("Disable steering wheel heater: %s", self.name)
+        await self.tesla_device.set_steering_wheel_heat(False)
         self.async_write_ha_state()
 
     @property
