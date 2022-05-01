@@ -6,16 +6,21 @@ from unittest.mock import patch
 from homeassistant import config_entries, data_entry_flow, setup
 from homeassistant.const import (
     CONF_ACCESS_TOKEN,
+    CONF_DOMAIN,
     CONF_SCAN_INTERVAL,
     CONF_TOKEN,
     CONF_USERNAME,
 )
 from pytest_homeassistant_custom_component.common import MockConfigEntry
+from teslajsonpy.const import AUTH_DOMAIN
 from teslajsonpy.exceptions import IncompleteCredentials, TeslaException
 
 from custom_components.tesla_custom.const import (
+    ATTR_POLLING_POLICY_CONNECTED,
     CONF_EXPIRATION,
+    CONF_POLLING_POLICY,
     CONF_WAKE_ON_START,
+    DEFAULT_POLLING_POLICY,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_WAKE_ON_START,
     DOMAIN,
@@ -60,9 +65,9 @@ async def test_form(hass):
     assert result2["data"] == {
         CONF_USERNAME: "test@email.com",
         CONF_TOKEN: TEST_TOKEN,
-        CONF_TOKEN: TEST_TOKEN,
         CONF_ACCESS_TOKEN: TEST_ACCESS_TOKEN,
         CONF_EXPIRATION: TEST_VALID_EXPIRATION,
+        CONF_DOMAIN: AUTH_DOMAIN,
     }
     assert len(mock_setup.mock_calls) == 1
     assert len(mock_setup_entry.mock_calls) == 1
@@ -222,10 +227,18 @@ async def test_option_flow(hass):
 
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        user_input={CONF_SCAN_INTERVAL: 350, CONF_WAKE_ON_START: True},
+        user_input={
+            CONF_SCAN_INTERVAL: 350,
+            CONF_WAKE_ON_START: True,
+            CONF_POLLING_POLICY: ATTR_POLLING_POLICY_CONNECTED,
+        },
     )
     assert result["type"] == "create_entry"
-    assert result["data"] == {CONF_SCAN_INTERVAL: 350, CONF_WAKE_ON_START: True}
+    assert result["data"] == {
+        CONF_SCAN_INTERVAL: 350,
+        CONF_WAKE_ON_START: True,
+        CONF_POLLING_POLICY: ATTR_POLLING_POLICY_CONNECTED,
+    }
 
 
 async def test_option_flow_defaults(hass):
@@ -245,6 +258,7 @@ async def test_option_flow_defaults(hass):
     assert result["data"] == {
         CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
         CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
+        CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
     }
 
 
@@ -265,4 +279,5 @@ async def test_option_flow_input_floor(hass):
     assert result["data"] == {
         CONF_SCAN_INTERVAL: MIN_SCAN_INTERVAL,
         CONF_WAKE_ON_START: DEFAULT_WAKE_ON_START,
+        CONF_POLLING_POLICY: DEFAULT_POLLING_POLICY,
     }
