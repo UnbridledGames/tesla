@@ -39,8 +39,8 @@ class TeslaSensor(TeslaDevice, SensorEntity):
             self._unique_id = f"{super().unique_id}_{self.type}"
 
     @property
-    def state(self) -> float | None:
-        """Return the state of the sensor."""
+    def native_value(self) -> float | None:
+        """Return the native_value of the sensor."""
         if self.tesla_device.type == "temperature sensor":
             if self.type == "outside":
                 return self.tesla_device.get_outside_temp()
@@ -58,8 +58,8 @@ class TeslaSensor(TeslaDevice, SensorEntity):
         return self.tesla_device.get_value()
 
     @property
-    def unit_of_measurement(self) -> str | None:
-        """Return the unit_of_measurement of the device."""
+    def native_unit_of_measurement(self) -> str | None:
+        """Return the native_unit_of_measurement of the device."""
         units = self.tesla_device.measurement
         if units == "F":
             return TEMP_FAHRENHEIT
@@ -103,6 +103,7 @@ class TeslaSensor(TeslaDevice, SensorEntity):
                     "added_range": self.tesla_device.added_range,
                     "charge_energy_added": self.tesla_device.charge_energy_added,
                     "charge_current_request": self.tesla_device.charge_current_request,
+                    "charge_current_request_max": self.tesla_device.charge_current_request_max,
                     "charger_actual_current": self.tesla_device.charger_actual_current,
                     "charger_voltage": self.tesla_device.charger_voltage,
                     "charger_power": self.tesla_device.charger_power,
